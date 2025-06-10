@@ -1,0 +1,24 @@
+{
+  "email": {
+    "required": "Harap isi alamat email.",
+    "email": "Format email tidak valid."
+  },
+  "password": {
+    "required": "Kata sandi wajib diisi.",
+    "min": "Kata sandi minimal 8 karakter."
+  },
+  "phone": {
+    "required": "Harap isi nomor telepon.",
+    "e164": "Format nomor telepon tidak valid."
+  },
+  "firstname": {
+    "required": "Nama depan wajib diisi."
+  },
+  "lastname": {
+    "required": "Nama belakang wajib diisi."
+  },
+  "default": {
+    "required": "Field ini wajib diisi.",
+    "email": "Format email tidak valid."
+  }
+}

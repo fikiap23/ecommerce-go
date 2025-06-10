@@ -1,0 +1,24 @@
+{
+  "email": {
+    "required": "Please provide your email address.",
+    "email": "The email format is invalid."
+  },
+  "password": {
+    "required": "Password is required.",
+    "min": "Password must be at least 8 characters."
+  },
+  "phone": {
+    "required": "Please provide your phone number.",
+    "e164": "The phone number format is invalid."
+  },
+  "firstname": {
+    "required": "Firstname is required."
+  },
+  "lastname": {
+    "required": "Lastname is required."
+  },
+  "default": {
+    "required": "This field is required.",
+    "email": "Invalid email format."
+  }
+}

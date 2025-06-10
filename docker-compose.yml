@@ -1,0 +1,31 @@
+version: '3.9'
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ecommerce_db
+    ports:
+      - '5428:5432'
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  backend-go:
+    build: .
+    container_name: backend-go
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: air
+    ports:
+      - '9000:9000'
+
+volumes:
+  db:
+    driver: local
