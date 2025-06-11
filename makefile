@@ -8,6 +8,10 @@ up:
 up-build:
 	docker compose up --build
 
+exec:
+	docker exec -it backend-go sh
+
+
 down:
 	docker compose down
 
