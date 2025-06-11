@@ -103,7 +103,15 @@ func (h *UserHandler) CreateProfile(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) GetProfile(ctx *fiber.Ctx) error {
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"message": "get profile"})
+	idUser := h.svc.Auth.GetCurrentUser(ctx).ID
+
+	user, err := h.svc.Repo.GetUserById(idUser)
+
+	if err != nil {
+		return utils.HandleError(ctx, err)
+	}
+
+	return utils.SuccessResponse(ctx, 200, http.StatusText(http.StatusOK), user)
 }
 
 func (h *UserHandler) AddToCart(ctx *fiber.Ctx) error {
