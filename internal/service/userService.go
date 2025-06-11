@@ -93,11 +93,11 @@ func (s *UserService) GetVerificationCode(idUser uint) (int, error) {
 	code := s.Auth.GenerateCode()	
 
 	// update user
-
-	_, err := s.Repo.UpdateUser(idUser, domain.UserUpdatePayload{
+	_, err := s.Repo.UpdateUser(idUser, &domain.UserUpdatePayload{
 		Code:      &code,
 		ExpiresAt: utils.PtrTime(time.Now().Add(5 * time.Minute)),
 	})
+
 	if err != nil {
 		return 0, err
 	}
