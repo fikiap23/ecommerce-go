@@ -42,7 +42,7 @@ func (a Auth) GenerateToken(id uint, email, role string) (string, error) {
 	}
 
 	claims := domain.JwtCustomClaims{
-		ID:    id,
+		Sub:    id,
 		Email: email,
 		Role:  role,
 		RegisteredClaims: jwt.RegisteredClaims{

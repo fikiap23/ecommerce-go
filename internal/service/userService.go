@@ -91,9 +91,13 @@ func (s *UserService) CreateProfile(id uint, input any) error {
 	return nil
 }
 
-func (s *UserService) GetProfile(id uint) (*domain.User, error) {
-	// logic
-	return nil, nil
+func (s *UserService) GetProfile(id uint, lang locales.Language) (*domain.User, error) {
+	user, err := s.Repo.GetUserById(id)
+
+	if err != nil {
+		return nil, utils.NewCustomError(errors.ErrUserNotFound, 404, lang)
+	}
+	return &user, nil
 }
 
 func (s *UserService) UpdateProfile(id uint, input any) error {
