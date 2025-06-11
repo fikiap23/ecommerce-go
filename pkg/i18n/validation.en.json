@@ -5,7 +5,7 @@
   },
   "password": {
     "required": "Password is required.",
-    "min": "Password must be at least 8 characters."
+    "min": "Password must be at least 6 characters."
   },
   "phone": {
     "required": "Please provide your phone number.",

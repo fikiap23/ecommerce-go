@@ -26,7 +26,7 @@ func SetupUserRoutes(rh *rest.RestHandler) {
     userRepo := repository.NewUserRepository(rh.DB)
 
     // Buat service dengan inject repository
-    userService := service.NewUserService(userRepo)
+    userService := service.NewUserService(userRepo, rh.Auth)
 	handler:=UserHandler{
 		svc: *userService,
 	}
@@ -53,7 +53,7 @@ func SetupUserRoutes(rh *rest.RestHandler) {
 }
 
 func (h *UserHandler) Register(ctx *fiber.Ctx) error {
-	var input dto.UserSignup
+	input:= dto.UserSignup{}
 	if err := utils.ParseAndValidate(ctx, &input); err != nil {
 		return utils.HandleError(ctx, err)
 	}
@@ -70,7 +70,7 @@ func (h *UserHandler) Register(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) Login(ctx *fiber.Ctx) error {
-	var input dto.UserLogin
+	 input:= dto.UserLogin{}
 
 	if err := utils.ParseAndValidate(ctx, &input); err != nil {
 		return utils.HandleError(ctx, err)

@@ -46,7 +46,7 @@ func ParseAndValidate[T any](ctx *fiber.Ctx, dest *T) error {
 	lang := GetLangOrDefault(ctx.Get("Accept-Language", "en"))
 
 	if err := ctx.BodyParser(dest); err != nil {
-		return NewCustomError(errors.ErrInvalidInput, 400, locales.Language(lang), err.Error())
+		return NewCustomError(errors.ErrInputInvalid, 400, locales.Language(lang), err.Error())
 	}
 
 	if err := Validate.Struct(dest); err != nil {

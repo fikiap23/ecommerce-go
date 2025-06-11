@@ -12,18 +12,22 @@ const (
 
 var messages = map[Language]map[errors.ErrorKey]string{
 	EN: {
-		errors.ErrInvalidInput:    "Invalid input",
+		errors.ErrInputInvalid:    "Invalid input",
 		errors.ErrValidationFailed: "Validation failed",
 		errors.ErrUserNotFound:    "User not found",
-		errors.ErrInvalidPassword: "Invalid password",
-		errors.ErrEmailExists:     "Email already exists",
+		errors.ErrUserCreationFailed: "Failed to create user",
+		errors.ErrPasswordInvalid: "Invalid password",
+		errors.ErrPasswordHashFailed: "Failed to hash password",
+		errors.ErrEmailAlreadyExists: "Email already exists",
 	},
 	ID: {
-		errors.ErrInvalidInput:    "Input tidak valid",
+		errors.ErrInputInvalid:    "Input tidak valid",
 		errors.ErrValidationFailed: "Validasi gagal",
 		errors.ErrUserNotFound:    "Pengguna tidak ditemukan",
-		errors.ErrInvalidPassword: "Kata sandi salah",
-		errors.ErrEmailExists:     "Email sudah digunakan",
+		errors.ErrUserCreationFailed: "Gagal membuat pengguna",
+		errors.ErrPasswordInvalid: "Kata sandi salah",
+		errors.ErrPasswordHashFailed: "Gagal mengenkripsi kata sandi",
+		errors.ErrEmailAlreadyExists: "Email sudah digunakan",
 	},
 }
 

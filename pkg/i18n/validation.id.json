@@ -5,7 +5,7 @@
   },
   "password": {
     "required": "Kata sandi wajib diisi.",
-    "min": "Kata sandi minimal 8 karakter."
+    "min": "Kata sandi minimal 6 karakter."
   },
   "phone": {
     "required": "Harap isi nomor telepon.",
