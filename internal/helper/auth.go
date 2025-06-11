@@ -3,6 +3,7 @@ package helper
 import (
 	"errors"
 	"go-ecommerce-app/internal/domain"
+	"go-ecommerce-app/pkg/utils"
 	"strings"
 	"time"
 
@@ -93,7 +94,7 @@ func (a Auth) Authorize(ctx *fiber.Ctx) error {
 	user, err := a.VerifyToken(ctx.Get("Authorization"))
 	if err != nil {
 		println(err)
-		return ctx.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "unauthorized"})
+		return utils.ErrorResponse(ctx, fiber.StatusUnauthorized, "unauthorized", err.Error())
 	}
 
 	// store user in context

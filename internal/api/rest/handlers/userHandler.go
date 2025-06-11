@@ -31,23 +31,25 @@ func SetupUserRoutes(rh *rest.RestHandler) {
 		svc: *userService,
 	}
 
+	publicRoutes:= app.Group("/users")
 	// Public endpoints
-	app.Post("/register", handler.Register)
-	app.Post("/login", handler.Login)
+	publicRoutes.Post("/register", handler.Register)
+	publicRoutes.Post("/login", handler.Login)
 
+	privateRoutes:= app.Group("/users", rh.Auth.Authorize)
 	// Private endpoints
-	app.Get("/verify", handler.GetVerificationCode)
-	app.Post("/verify", handler.Verify)
-	app.Post("/profile", handler.CreateProfile)
-	app.Get("/profile", handler.GetProfile)
+	privateRoutes.Get("/verify", handler.GetVerificationCode)
+	privateRoutes.Post("/verify", handler.Verify)
+	privateRoutes.Post("/profile", handler.CreateProfile)
+	privateRoutes.Get("/profile", handler.GetProfile)
 
-	app.Post("/cart", handler.AddToCart)
-	app.Get("/cart", handler.GetCart)
-	app.Post("/order", handler.CreateOrder)
-	app.Get("/order", handler.GetOrder)
-	app.Get("/order/:id", handler.GetOrderById)
+	privateRoutes.Post("/cart", handler.AddToCart)
+	privateRoutes.Get("/cart", handler.GetCart)
+	privateRoutes.Post("/order", handler.CreateOrder)
+	privateRoutes.Get("/order", handler.GetOrder)
+	privateRoutes.Get("/order/:id", handler.GetOrderById)
 
-	app.Post("/become-seller", handler.BecomeSeller)
+	privateRoutes.Post("/become-seller", handler.BecomeSeller)
 
 	
 }

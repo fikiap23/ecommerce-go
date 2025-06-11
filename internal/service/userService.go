@@ -8,7 +8,6 @@ import (
 	"go-ecommerce-app/pkg/errors"
 	"go-ecommerce-app/pkg/locales"
 	"go-ecommerce-app/pkg/utils"
-	"log"
 )
 
 type UserService struct {
@@ -22,8 +21,6 @@ func NewUserService(repo repository.UserRepository, auth helper.Auth) *UserServi
 
 
 func (s *UserService) Signup(input dto.UserSignup, lang locales.Language) (string, error) {
-	log.Println("Signup input:", input)
-
 	// Cek apakah email sudah terdaftar
 	existingUser, err := s.Repo.GetUserByEmail(input.Email)
 	if err == nil && existingUser.ID != 0 {
