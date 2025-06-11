@@ -91,8 +91,16 @@ func (h *UserHandler) Login(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) GetVerificationCode(ctx *fiber.Ctx) error {
-	// user:= h.svc.Auth.GetCurrentUser(ctx).Sub
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"message": "get verification code"})
+	userId:= h.svc.Auth.GetCurrentUser(ctx).Sub
+
+	code, err := h.svc.GetVerificationCode(userId)
+	if err != nil {
+		return utils.HandleError(ctx, err)
+	}
+
+	return utils.SuccessResponse(ctx, 200, http.StatusText(http.StatusOK),fiber.Map{
+		"code": code,
+	})
 }
 
 func (h *UserHandler) Verify(ctx *fiber.Ctx) error {

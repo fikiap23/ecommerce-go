@@ -8,6 +8,7 @@ import (
 	"go-ecommerce-app/pkg/errors"
 	"go-ecommerce-app/pkg/locales"
 	"go-ecommerce-app/pkg/utils"
+	"time"
 )
 
 type UserService struct {
@@ -76,9 +77,34 @@ func (s *UserService) Login(input dto.UserLogin, lang locales.Language) (string,
 	return token, nil
 }
 
-func (s *UserService) GetVerificationCode(e domain.User) (int, error) {
-	// logic
-	return 0, nil
+func (s *UserService) isVerified(id uint) bool {
+	currentUser,err:= s.Repo.GetUserById(id)
+
+	return err == nil && currentUser.Verified
+}
+
+func (s *UserService) GetVerificationCode(idUser uint) (int, error) {
+	// if user already verified
+	if s.isVerified(idUser) {
+		return 0, nil
+	}
+
+	// generate code
+	code := s.Auth.GenerateCode()	
+
+	// update user
+	expiresAt := time.Now().Add(5 * time.Minute)
+
+	_, err := s.Repo.UpdateUser(idUser, domain.UserUpdatePayload{
+		Code:      &code,
+		ExpiresAt: &expiresAt,
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	// return verification code
+	return code, nil
 }
 
 func (s *UserService) VerifyCode(id uint, code int) error {

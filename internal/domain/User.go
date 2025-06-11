@@ -16,3 +16,16 @@ type User struct {
 	CreatedAt time.Time `json:"created_at" gorm:"default:current_timestamp"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+
+type UserUpdatePayload struct {
+	FirstName *string    `json:"first_name,omitempty"`
+	LastName  *string    `json:"last_name,omitempty"`
+	Email     *string    `json:"email,omitempty"`
+	Phone     *string    `json:"phone,omitempty"`
+	Password  *string    `json:"password,omitempty"`
+	Code      *int       `json:"code,omitempty"`
+	ExpiresAt *time.Time `json:"expires_at,omitempty"`
+	Verified  *bool      `json:"verified,omitempty"`
+	UserType  *string    `json:"user_type,omitempty"`
+}

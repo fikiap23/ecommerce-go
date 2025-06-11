@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"go-ecommerce-app/internal/domain"
+	"go-ecommerce-app/pkg/utils"
 	"log"
 
 	"gorm.io/gorm"
@@ -13,7 +14,7 @@ type UserRepository interface {
 	CreateUser(user domain.User) (domain.User, error)
 	GetUserByEmail(email string) (domain.User, error)
 	GetUserById(id uint) (domain.User, error)
-	UpdateUser(id uint, updates map[string]interface{}) (domain.User, error)
+	UpdateUser(id uint, payload domain.UserUpdatePayload) (domain.User, error)
 }
 
 // userRepository adalah implementasi UserRepository yang menggunakan GORM
@@ -54,16 +55,18 @@ func (r *userRepository) GetUserById(id uint) (domain.User, error) {
 }
 
 // UpdateUser mengupdate data user berdasarkan id
-func (r *userRepository) UpdateUser(id uint, updates map[string]interface{}) (domain.User, error) {
+// repository/user_repository.go
+
+func (r *userRepository) UpdateUser(id uint, payload domain.UserUpdatePayload) (domain.User, error) {
 	var user domain.User
 
-	// Cek apakah user ada
 	err := r.db.First(&user, id).Error
 	if err != nil {
 		return domain.User{}, err
 	}
 
-	// Lakukan update hanya pada field yang ada di map
+	updates := utils.StructToMap(payload)
+
 	err = r.db.Model(&user).Updates(updates).Error
 	if err != nil {
 		return domain.User{}, err

@@ -108,6 +108,9 @@ func (a Auth) GetCurrentUser(ctx *fiber.Ctx) *domain.JwtCustomClaims {
 	return claims
 }
 
+func (a Auth) GenerateCode() int {
+	return utils.GenRandomNumber(6)
+}
 func extractTokenString(bearer string) (string, error) {
 	parts := strings.SplitN(bearer, " ", 2)
 	if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
