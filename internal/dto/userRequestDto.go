@@ -11,3 +11,7 @@ type UserSignup struct {
 	LastName  string `json:"last_name" validate:"required"`
 	Phone     string `json:"phone" validate:"required,e164"`
 }
+
+type UserVerification struct {
+	Code int `json:"code" validate:"required"`
+}

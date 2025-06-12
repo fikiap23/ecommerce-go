@@ -91,9 +91,10 @@ func (h *UserHandler) Login(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) GetVerificationCode(ctx *fiber.Ctx) error {
+	lang := utils.GetLanguageFromHeader(ctx)
 	userId:= h.svc.Auth.GetCurrentUser(ctx).Sub
 
-	code, err := h.svc.GetVerificationCode(userId)
+	code, err := h.svc.GetVerificationCode(userId, lang)
 	if err != nil {
 		return utils.HandleError(ctx, err)
 	}
@@ -104,7 +105,23 @@ func (h *UserHandler) GetVerificationCode(ctx *fiber.Ctx) error {
 }
 
 func (h *UserHandler) Verify(ctx *fiber.Ctx) error {
-	return ctx.Status(http.StatusOK).JSON(fiber.Map{"message": "verify"})
+	input:= dto.UserVerification{}
+	lang := utils.GetLanguageFromHeader(ctx)
+	userId:= h.svc.Auth.GetCurrentUser(ctx).Sub
+
+
+	if err := utils.ParseAndValidate(ctx, &input); err != nil {
+		return utils.HandleError(ctx, err)
+	}
+
+	err := h.svc.VerifyCode(userId, input.Code, lang)
+
+	if err != nil {
+		return utils.HandleError(ctx, err)
+	}
+
+	return utils.SuccessResponse(ctx, 200, http.StatusText(http.StatusOK),nil)
+
 }
 
 func (h *UserHandler) CreateProfile(ctx *fiber.Ctx) error {

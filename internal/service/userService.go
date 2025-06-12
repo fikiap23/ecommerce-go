@@ -83,10 +83,10 @@ func (s *UserService) isVerified(id uint) bool {
 	return err == nil && currentUser.Verified
 }
 
-func (s *UserService) GetVerificationCode(idUser uint) (int, error) {
+func (s *UserService) GetVerificationCode(idUser uint, lang locales.Language) (int, error) {
 	// if user already verified
 	if s.isVerified(idUser) {
-		return 0, nil
+		return 0, utils.NewCustomError(errors.ErrUserAlreadyVerified, 400, lang)
 	}
 
 	// generate code
@@ -99,15 +99,44 @@ func (s *UserService) GetVerificationCode(idUser uint) (int, error) {
 	})
 
 	if err != nil {
-		return 0, err
+		return 0, utils.NewCustomError(errors.ErrUserUpdateFailed, 500, lang, err.Error())
 	}
+
+	// send email
 
 	// return verification code
 	return code, nil
 }
 
-func (s *UserService) VerifyCode(id uint, code int) error {
-	// logic
+func (s *UserService) VerifyCode(id uint, code int, lang locales.Language) error {
+	// get user
+	user, err := s.Repo.GetUserById(id)
+	if err != nil {
+		return utils.NewCustomError(errors.ErrUserNotFound, 404, lang)
+	}
+
+	if(user.Verified) {
+		return utils.NewCustomError(errors.ErrUserAlreadyVerified, 400, lang)
+	}
+
+	if(user.Code != code) {
+		return utils.NewCustomError(errors.ErrUserVerificationInvalid, 400, lang)
+	}
+
+	if(user.ExpiresAt.Before(time.Now())) {
+		return utils.NewCustomError(errors.ErrUserVerificationExpired, 400, lang)
+	}
+
+	// update user
+	_, err = s.Repo.UpdateUser(id, &domain.UserUpdatePayload{
+		Verified: utils.PtrBool(true),
+		Code:     utils.PtrInt(0),
+	})
+
+	if err != nil {
+		return utils.NewCustomError(errors.ErrUserUpdateFailed, 500, lang, err.Error())
+	}
+	
 	return nil
 }
 
