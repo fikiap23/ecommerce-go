@@ -13,21 +13,15 @@ import (
 	"gorm.io/gorm"
 )
 
-func StartServer(config config.AppConfig) {
+func CreateApp(config config.AppConfig) *fiber.App {
 	app := fiber.New()
-	log.Println("Server started on", config.ServerPort)
 
 	db, err := gorm.Open(postgres.Open(config.Dsn), &gorm.Config{})
-
 	if err != nil {
 		log.Fatal("failed to connect database, error: ", err)
 	}
 
-	log.Println("Database connected")
-
-	// run migrations
 	db.AutoMigrate(&domain.User{})
-
 	auth := helper.SetupAuth(config.AppSecret)
 
 	rh := &rest.RestHandler{
@@ -37,9 +31,16 @@ func StartServer(config config.AppConfig) {
 	}
 
 	setupRoutes(rh)
+	return app
+}
 
+
+func StartServer(config config.AppConfig) {
+	app := CreateApp(config)
+	log.Println("Server started on", config.ServerPort)
 	app.Listen(config.ServerPort)
 }
+
 
 
 func setupRoutes(rh *rest.RestHandler) {

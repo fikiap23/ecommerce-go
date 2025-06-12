@@ -2,39 +2,57 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 )
 
 type AppConfig struct {
 	ServerPort string
-	Dsn string
-	AppSecret string
+	Dsn        string
+	AppSecret  string
 }
 
-func SetupEnv()(cfg AppConfig, err error) {
-	if os.Getenv("APP_ENV") == "dev" {
-		godotenv.Load()
-	}
-	htppPort := os.Getenv("HTTP_PORT")
-	if len(htppPort) < 1 {
-		return AppConfig{}, errors.New("HTTP_PORT is not set")
+// SetupEnv loads environment variables, optionally from a .env file
+func SetupEnv(dotenvPath string) (AppConfig, error) {
+	// Determine if we should load from a .env file
+	appEnv := strings.TrimSpace(os.Getenv("APP_ENV"))
+	shouldLoadDotenv := appEnv == "dev" || dotenvPath != ""
+
+	// Load .env file if needed
+	if shouldLoadDotenv {
+		envFile := ".env"
+		if dotenvPath != "" {
+			envFile = dotenvPath
+		}
+
+		if err := godotenv.Load(envFile); err != nil {
+			return AppConfig{}, fmt.Errorf("failed to load env file '%s': %w", envFile, err)
+		}
 	}
 
-	Dsn := os.Getenv("DSN")
-	if len(Dsn) < 1 {
-		return AppConfig{}, errors.New("DSN is not set")
+	// Fetch required environment variables
+	httpPort := strings.TrimSpace(os.Getenv("HTTP_PORT"))
+	if httpPort == "" {
+		return AppConfig{}, errors.New("missing required environment variable: HTTP_PORT")
 	}
 
-	appSecret := os.Getenv("APP_SECRET")
-	if len(os.Getenv("APP_SECRET")) < 1 {
-		return AppConfig{}, errors.New("APP_SECRET is not set")
+	dsn := strings.TrimSpace(os.Getenv("DSN"))
+	if dsn == "" {
+		return AppConfig{}, errors.New("missing required environment variable: DSN")
+	}
+
+	appSecret := strings.TrimSpace(os.Getenv("APP_SECRET"))
+	if appSecret == "" {
+		return AppConfig{}, errors.New("missing required environment variable: APP_SECRET")
 	}
 
 	return AppConfig{
-		ServerPort: htppPort,
-		Dsn: Dsn,
-		AppSecret: appSecret,
+		ServerPort: httpPort,
+		Dsn:        dsn,
+		AppSecret:  appSecret,
 	}, nil
 }
+

@@ -1,0 +1,41 @@
+version: '3.9'
+services:
+  test-postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_pass
+      POSTGRES_DB: test_db
+    ports:
+      - '5433:5432'
+    volumes:
+      - test_db:/var/lib/postgresql/data
+    networks:
+      - test_net
+
+  backend-go-test:
+    build: .
+    container_name: backend-go-test
+    depends_on:
+      - test-postgres
+    env_file:
+      - .env.test
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: go test -v ./test/e2e
+    environment:
+      - APP_ENV=test
+    ports:
+      - '9001:9000'
+    networks:
+      - test_net
+
+volumes:
+  test_db:
+    driver: local
+
+networks:
+  test_net:
+    driver: bridge
