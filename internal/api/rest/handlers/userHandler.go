@@ -3,6 +3,7 @@ package handlers
 import (
 	"go-ecommerce-app/internal/api/rest"
 	"go-ecommerce-app/internal/dto"
+	"go-ecommerce-app/internal/helper"
 	"go-ecommerce-app/internal/repository"
 	"go-ecommerce-app/internal/service"
 	"go-ecommerce-app/pkg/utils"
@@ -12,8 +13,12 @@ import (
 )
 
 type UserHandler struct {
-	// svc service.UserService
-	svc service.UserService
+	svc  service.UserService
+	auth helper.Auth
+}
+
+func NewUserHandler(svc service.UserService) *UserHandler {
+	return &UserHandler{svc: svc}
 }
 
 func SetupUserRoutes(rh *rest.RestHandler) {
@@ -27,8 +32,9 @@ func SetupUserRoutes(rh *rest.RestHandler) {
 
     // Buat service dengan inject repository
     userService := service.NewUserService(userRepo, rh.Auth)
-	handler:=UserHandler{
-		svc: *userService,
+	handler := UserHandler{
+		svc: userService, 
+		auth: rh.Auth,
 	}
 
 	publicRoutes:= app.Group("/users")
@@ -92,7 +98,7 @@ func (h *UserHandler) Login(ctx *fiber.Ctx) error {
 
 func (h *UserHandler) GetVerificationCode(ctx *fiber.Ctx) error {
 	lang := utils.GetLanguageFromHeader(ctx)
-	userId:= h.svc.Auth.GetCurrentUser(ctx).Sub
+	userId:= h.auth.GetCurrentUser(ctx).Sub
 
 	code, err := h.svc.GetVerificationCode(userId, lang)
 	if err != nil {
@@ -107,7 +113,7 @@ func (h *UserHandler) GetVerificationCode(ctx *fiber.Ctx) error {
 func (h *UserHandler) Verify(ctx *fiber.Ctx) error {
 	input:= dto.UserVerification{}
 	lang := utils.GetLanguageFromHeader(ctx)
-	userId:= h.svc.Auth.GetCurrentUser(ctx).Sub
+	userId:= h.auth.GetCurrentUser(ctx).Sub
 
 
 	if err := utils.ParseAndValidate(ctx, &input); err != nil {
@@ -130,7 +136,7 @@ func (h *UserHandler) CreateProfile(ctx *fiber.Ctx) error {
 
 func (h *UserHandler) GetProfile(ctx *fiber.Ctx) error {
 	lang := utils.GetLanguageFromHeader(ctx)
-	idUser := h.svc.Auth.GetCurrentUser(ctx).Sub
+	idUser := h.auth.GetCurrentUser(ctx).Sub
 
 	user, err := h.svc.GetProfile(idUser, lang)
 
