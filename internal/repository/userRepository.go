@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// UserRepository adalah interface yang menjelaskan operasi CRUD untuk User
+//mockery --name=UserRepository --dir=internal/repository --output=internal/service/mocks --outpkg=mocks --case=snake
 type UserRepository interface {
 	CreateUser(user domain.User) (domain.User, error)
 	GetUserByEmail(email string) (domain.User, error)

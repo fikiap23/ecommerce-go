@@ -14,15 +14,28 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Auth struct {
+// mockery --name=Auth --dir=internal/helper --output=internal/service/mocks --outpkg=mocks --case=snake
+
+type Auth interface {
+	CreateHashedPassword(password string) (string, error)
+	GenerateToken(id uint, email, role string) (string, error)
+	VerifyPassword(password, hashedPassword string) (bool, error)
+	VerifyToken(bearerToken string) (*domain.JwtCustomClaims, error)
+	Authorize(ctx *fiber.Ctx) error
+	GetCurrentUser(ctx *fiber.Ctx) *domain.JwtCustomClaims
+	GenerateCode() int
+}
+
+type authHelper struct {
 	Secret string
 }
 
+// SetupAuth mengembalikan Auth interface
 func SetupAuth(secret string) Auth {
-	return Auth{Secret: secret}
+	return &authHelper{Secret: secret}
 }
 
-func (a Auth) CreateHashedPassword(password string) (string, error) {
+func (a *authHelper) CreateHashedPassword(password string) (string, error) {
 	if password == "" {
 		return "", errors.New("password is required")
 	}
@@ -36,7 +49,7 @@ func (a Auth) CreateHashedPassword(password string) (string, error) {
 	return string(hash), nil
 }
 
-func (a Auth) GenerateToken(id uint, email, role string) (string, error) {
+func (a *authHelper) GenerateToken(id uint, email, role string) (string, error) {
 	if id == 0 || email == "" || role == "" {
 		return "", fmt.Errorf("invalid token payload: id=%d, email=%s, role=%s", id, email, role)
 	}
@@ -55,7 +68,7 @@ func (a Auth) GenerateToken(id uint, email, role string) (string, error) {
 	return token.SignedString([]byte(a.Secret))
 }
 
-func (a Auth) VerifyPassword(password, hashedPassword string) (bool, error) {
+func (a *authHelper) VerifyPassword(password, hashedPassword string) (bool, error) {
 	if password == "" {
 		return false, errors.New("password is required")
 	}
@@ -68,7 +81,7 @@ func (a Auth) VerifyPassword(password, hashedPassword string) (bool, error) {
 	return true, nil
 }
 
-func (a Auth) VerifyToken(bearerToken string) (*domain.JwtCustomClaims, error) {
+func (a *authHelper) VerifyToken(bearerToken string) (*domain.JwtCustomClaims, error) {
 	tokenString, err := extractTokenString(bearerToken)
 	if err != nil {
 		return nil, err
@@ -89,7 +102,7 @@ func (a Auth) VerifyToken(bearerToken string) (*domain.JwtCustomClaims, error) {
 	return claims, nil
 }
 
-func (a Auth) Authorize(ctx *fiber.Ctx) error {
+func (a *authHelper) Authorize(ctx *fiber.Ctx) error {
 	user, err := a.VerifyToken(ctx.Get("Authorization"))
 	if err != nil {
 		log.Println("Authorization failed:", err)
@@ -100,7 +113,7 @@ func (a Auth) Authorize(ctx *fiber.Ctx) error {
 	return ctx.Next()
 }
 
-func (a Auth) GetCurrentUser(ctx *fiber.Ctx) *domain.JwtCustomClaims {
+func (a *authHelper) GetCurrentUser(ctx *fiber.Ctx) *domain.JwtCustomClaims {
 	claims, ok := ctx.Locals("user").(*domain.JwtCustomClaims)
 	if !ok {
 		return nil
@@ -108,7 +121,7 @@ func (a Auth) GetCurrentUser(ctx *fiber.Ctx) *domain.JwtCustomClaims {
 	return claims
 }
 
-func (a Auth) GenerateCode() int {
+func (a *authHelper) GenerateCode() int {
 	return utils.GenRandomNumber(6)
 }
 func extractTokenString(bearer string) (string, error) {
