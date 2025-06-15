@@ -28,6 +28,7 @@ func CreateApp(config config.AppConfig) *fiber.App {
 		App: app,
 		DB: db,
 		Auth: auth,
+		Config: config,
 	}
 
 	setupRoutes(rh)

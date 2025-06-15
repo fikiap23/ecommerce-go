@@ -1,12 +1,15 @@
 package service
 
 import (
+	"fmt"
+	"go-ecommerce-app/config"
 	"go-ecommerce-app/internal/domain"
 	"go-ecommerce-app/internal/dto"
 	"go-ecommerce-app/internal/helper"
 	"go-ecommerce-app/internal/repository"
 	"go-ecommerce-app/pkg/errors"
 	"go-ecommerce-app/pkg/locales"
+	"go-ecommerce-app/pkg/notification"
 	"go-ecommerce-app/pkg/utils"
 	"time"
 )
@@ -14,10 +17,11 @@ import (
 type userService struct {
 	Repo repository.UserRepository
 	Auth helper.Auth
+	Config config.AppConfig
 }
 
-func NewUserService(repo repository.UserRepository, auth helper.Auth) UserService {
-	return &userService{Repo: repo, Auth: auth}
+func NewUserService(repo repository.UserRepository, auth helper.Auth, config config.AppConfig) UserService {
+	return &userService{Repo: repo, Auth: auth, Config: config}
 }
 
 func (s *userService) Signup(input dto.UserSignup, lang locales.Language) (string, error) {
@@ -82,29 +86,32 @@ func (s *userService) isVerified(id uint) bool {
 	return err == nil && currentUser.Verified
 }
 
-func (s *userService) GetVerificationCode(idUser uint, lang locales.Language) (int, error) {
+func (s *userService) GetVerificationCode(idUser uint, lang locales.Language)  error {
 	// if user already verified
 	if s.isVerified(idUser) {
-		return 0, utils.NewCustomError(errors.ErrUserAlreadyVerified, 400, lang)
+		return utils.NewCustomError(errors.ErrUserAlreadyVerified, 400, lang)
 	}
 
 	// generate code
 	code := s.Auth.GenerateCode()	
 
 	// update user
-	_, err := s.Repo.UpdateUser(idUser, &domain.UserUpdatePayload{
+	user, err := s.Repo.UpdateUser(idUser, &domain.UserUpdatePayload{
 		Code:      &code,
 		ExpiresAt: utils.PtrTime(time.Now().Add(5 * time.Minute)),
 	})
 
 	if err != nil {
-		return 0, utils.NewCustomError(errors.ErrUserUpdateFailed, 500, lang, err.Error())
+		return utils.NewCustomError(errors.ErrUserUpdateFailed, 500, lang, err.Error())
 	}
 
 	// send email
+	notificationClient := notification.NewNotificationClient(s.Config)
+	message := fmt.Sprintf("Hi %s, your verification code is %d", user.FirstName, code)
+	notificationClient.SendSMS(user.Phone, message)
 
 	// return verification code
-	return code, nil
+	return nil
 }
 
 func (s *userService) VerifyCode(id uint, code int, lang locales.Language) error {

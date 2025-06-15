@@ -31,7 +31,7 @@ func SetupUserRoutes(rh *rest.RestHandler) {
     userRepo := repository.NewUserRepository(rh.DB)
 
     // Buat service dengan inject repository
-    userService := service.NewUserService(userRepo, rh.Auth)
+    userService := service.NewUserService(userRepo, rh.Auth, rh.Config)
 	handler := UserHandler{
 		svc: userService, 
 		auth: rh.Auth,
@@ -100,14 +100,12 @@ func (h *UserHandler) GetVerificationCode(ctx *fiber.Ctx) error {
 	lang := utils.GetLanguageFromHeader(ctx)
 	userId:= h.auth.GetCurrentUser(ctx).Sub
 
-	code, err := h.svc.GetVerificationCode(userId, lang)
+	 err := h.svc.GetVerificationCode(userId, lang)
 	if err != nil {
 		return utils.HandleError(ctx, err)
 	}
 
-	return utils.SuccessResponse(ctx, 200, http.StatusText(http.StatusOK),fiber.Map{
-		"code": code,
-	})
+	return utils.SuccessResponse(ctx, 200, http.StatusText(http.StatusOK),nil)
 }
 
 func (h *UserHandler) Verify(ctx *fiber.Ctx) error {

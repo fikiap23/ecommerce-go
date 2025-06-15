@@ -10,7 +10,7 @@ import (
 
 func main() {
 	
-	cfg, err := config.SetupEnv(".env.test")
+	cfg, err := config.SetupEnv(".env")
 	if err != nil {
 		log.Fatalf("config error: %v", err)
 		panic(err)

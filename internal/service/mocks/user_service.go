@@ -241,31 +241,21 @@ func (_m *UserService) GetProfile(id uint, lang locales.Language) (*domain.User,
 }
 
 // GetVerificationCode provides a mock function with given fields: idUser, lang
-func (_m *UserService) GetVerificationCode(idUser uint, lang locales.Language) (int, error) {
+func (_m *UserService) GetVerificationCode(idUser uint, lang locales.Language) error {
 	ret := _m.Called(idUser, lang)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetVerificationCode")
 	}
 
-	var r0 int
-	var r1 error
-	if rf, ok := ret.Get(0).(func(uint, locales.Language) (int, error)); ok {
-		return rf(idUser, lang)
-	}
-	if rf, ok := ret.Get(0).(func(uint, locales.Language) int); ok {
+	var r0 error
+	if rf, ok := ret.Get(0).(func(uint, locales.Language) error); ok {
 		r0 = rf(idUser, lang)
 	} else {
-		r0 = ret.Get(0).(int)
+		r0 = ret.Error(0)
 	}
 
-	if rf, ok := ret.Get(1).(func(uint, locales.Language) error); ok {
-		r1 = rf(idUser, lang)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // Login provides a mock function with given fields: input, lang

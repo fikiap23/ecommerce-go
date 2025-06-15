@@ -10,7 +10,7 @@ import (
 type UserService interface {
 	Signup(input dto.UserSignup, lang locales.Language) (string, error)
 	Login(input dto.UserLogin, lang locales.Language) (string, error)
-	GetVerificationCode(idUser uint, lang locales.Language) (int, error)
+	GetVerificationCode(idUser uint, lang locales.Language) error
 	VerifyCode(id uint, code int, lang locales.Language) error
 	CreateProfile(id uint, input any) error
 	GetProfile(id uint, lang locales.Language) (*domain.User, error)

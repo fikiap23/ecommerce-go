@@ -2,6 +2,7 @@ package service_test
 
 import (
 	"errors"
+	"go-ecommerce-app/config"
 	"go-ecommerce-app/internal/domain"
 	"go-ecommerce-app/internal/dto"
 	"go-ecommerce-app/internal/service"
@@ -16,7 +17,14 @@ import (
 func TestUserService_Login_Success(t *testing.T) {
 	mockRepo := new(mocks.UserRepository)
 	mockAuth := new(mocks.Auth)
-	svc := service.NewUserService(mockRepo, mockAuth)
+
+	cfg := config.AppConfig{
+		ServerPort: "8080",
+		Dsn:        "test-dsn",
+		AppSecret:  "test-secret",
+	}
+
+	svc := service.NewUserService(mockRepo, mockAuth, cfg)
 
 	input := dto.UserLogin{
 		Email:    "test@example.com",
@@ -44,7 +52,13 @@ func TestUserService_Login_Success(t *testing.T) {
 func TestUserService_Login_InvalidPassword(t *testing.T) {
 	mockRepo := new(mocks.UserRepository)
 	mockAuth := new(mocks.Auth)
-	svc := service.NewUserService(mockRepo, mockAuth)
+
+	cfg := config.AppConfig{
+		ServerPort: "8080",
+		Dsn:        "test-dsn",
+		AppSecret:  "test-secret",
+	}
+	svc := service.NewUserService(mockRepo, mockAuth, cfg)
 
 	input := dto.UserLogin{
 		Email:    "test@example.com",
@@ -75,7 +89,13 @@ func TestUserService_Login_InvalidPassword(t *testing.T) {
 func TestUserService_Login_UserNotFound(t *testing.T) {
 	mockRepo := new(mocks.UserRepository)
 	mockAuth := new(mocks.Auth)
-	svc := service.NewUserService(mockRepo, mockAuth)
+
+	cfg := config.AppConfig{
+		ServerPort: "8080",
+		Dsn:        "test-dsn",
+		AppSecret:  "test-secret",
+	}
+	svc := service.NewUserService(mockRepo, mockAuth, cfg)
 
 	input := dto.UserLogin{
 		Email:    "notfound@example.com",
@@ -98,7 +118,13 @@ func TestUserService_Login_UserNotFound(t *testing.T) {
 func TestUserService_Signup_Success(t *testing.T) {
 	mockRepo := new(mocks.UserRepository)
 	mockAuth := new(mocks.Auth)
-	svc := service.NewUserService(mockRepo, mockAuth)
+	cfg := config.AppConfig{
+		ServerPort: "8080",
+		Dsn:        "test-dsn",
+		AppSecret:  "test-secret",
+	}
+
+	svc := service.NewUserService(mockRepo, mockAuth, cfg)
 
 	input := dto.UserSignup{
 		FirstName: "John",
